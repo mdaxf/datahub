@@ -1,0 +1,13 @@
+{
+  "host": "http://localhost:3500/v1.0/subscriptions/",
+  "topics": [
+    {
+      "name": "topic1",
+      "handler": "handleTopic1"
+    },
+    {
+      "name": "topic2",
+      "handler": "handleTopic2"
+    }
+  ]
+}
