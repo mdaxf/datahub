@@ -9,9 +9,9 @@
         "caFile": "",
         "topics": [
           {
-            "topic": "test123/machien01",
+            "topic": "gauge/value",
             "qos": "0",
-            "handler": "IAC_MachineDataCollection"
+            "handler": "IAC_EM_GaugeDataCollection"
           },
           {
             "topic": "test123/machien02",
