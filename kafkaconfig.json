@@ -1,0 +1,29 @@
+{
+    "kafkas": [
+      {
+        "type": "",
+        "server": "broker.hivemq.com",
+        "port": "1883",
+        "certFile": "",
+        "keyFile": "",
+        "caFile": "",
+        "topics": [
+          {
+            "topic": "gauge/value",
+            "type": "bpm",
+            "handler": "IAC_EM_GaugeDataCollection"
+          },
+          {
+            "topic": "test123/machien02",
+            "type": "query",
+            "handler": "publish"
+          },
+          {
+            "topic": "test123/machien02",
+            "type": "storeprocedure",
+            "handler": "publish"
+          }
+        ]
+      }
+    ]
+  }

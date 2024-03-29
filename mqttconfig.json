@@ -11,11 +11,19 @@
           {
             "topic": "gauge/value",
             "qos": "0",
+            "handlertype": "bpm",
             "handler": "IAC_EM_GaugeDataCollection"
           },
           {
             "topic": "test123/machien02",
             "qos": "0",
+            "handlertype": "query",
+            "handler": "publish"
+          },
+          {
+            "topic": "test123/machien02",
+            "qos": "0",
+            "handlertype": "sp",
             "handler": "publish"
           }
         ]

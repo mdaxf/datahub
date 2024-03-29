@@ -10,6 +10,7 @@ import (
 	"github.com/mdaxf/datahub/dapr"
 	//	"github.com/mdaxf/datahub/mqtt"
 	dbconn "github.com/mdaxf/datahub/database"
+	"github.com/mdaxf/datahub/kafka"
 	"github.com/mdaxf/iac/documents"
 	"github.com/mdaxf/iac/integration/mqttclient"
 	"github.com/mdaxf/iac/integration/signalr"
@@ -68,12 +69,18 @@ func main() {
 		defer dbconn.DB.Close()
 	}
 
-	initializesignalRClient(config.SingalRConfig)
+	go func() {
+		initializesignalRClient(config.SingalRConfig)
+	}()
 
 	//initializeDaprClient()
+	go func() {
+		initializeMqttClient()
+	}()
 
-	initializeMqttClient()
-
+	go func() {
+		initializeKafkaClient()
+	}()
 	// Close the DocDB connection
 	if DocDBconn.MongoDBClient != nil {
 		defer DocDBconn.MongoDBClient.Disconnect(context.Background())
@@ -157,6 +164,40 @@ func initializeMqttClient() {
 			ilog.Debug(fmt.Sprintf("MQTT Client configuration: %s", logger.ConvertJson(mqttcfg)))
 			ilog.Debug(fmt.Sprintf("parameters: %s, %s, %s", dbconn.DB, DocDBconn, SignalRClient))
 			mqttclient.NewMqttClientbyExternal(mqttcfg, dbconn.DB, DocDBconn, SignalRClient)
+		}
+
+	}()
+
+}
+
+func initializeKafkaClient() {
+	ilog := logger.Log{ModuleName: logger.Framework, User: "System", ControllerName: "Kafka"}
+	ilog.Debug("initialize Kafka Client")
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		ilog.Debug("initialize Kafka Client")
+
+		data, err := ioutil.ReadFile("kafkaconfig.json")
+		if err != nil {
+			ilog.Debug(fmt.Sprintf("failed to read configuration file: %v", err))
+
+		}
+		ilog.Debug(fmt.Sprintf("Kafka Clients configuration file: %s", string(data)))
+		var kafkasconfig kafka.KafkasConfig
+		err = json.Unmarshal(data, &kafkasconfig)
+		if err != nil {
+			ilog.Debug(fmt.Sprintf("failed to unmarshal the configuration file: %v", err))
+
+		}
+		ilog.Debug(fmt.Sprintf("Kafka Clients configuration: %v", logger.ConvertJson(kafkasconfig)))
+
+		for _, kafkacfg := range kafkasconfig.Kafkas {
+			ilog.Debug(fmt.Sprintf("MQTT Client configuration: %s", logger.ConvertJson(kafkacfg)))
+			ilog.Debug(fmt.Sprintf("parameters: %s, %s, %s", dbconn.DB, DocDBconn, SignalRClient))
+			kafka.NewKafkaConsumer(kafkacfg)
 		}
 
 	}()
